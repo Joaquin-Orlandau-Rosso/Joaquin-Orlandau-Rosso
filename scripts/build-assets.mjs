@@ -287,6 +287,65 @@ ${REDUCED}
   }
 }
 
+// ---------- logros de GitHub ----------
+const ACH_ICONS = {
+  // íconos centrados en un viewBox 24x24
+  shark: '<path d="M2 17c6 0 7-1 10-1 .5-4 2.5-9 6-11-1 3-1 5 0 7 2 .4 3.5 1.6 4 4-2 0-3-1-4.5-1C15 17 11 19 6 19c-1.5 0-3-.7-4-2z" fill="CUR"/><circle cx="17" cy="11.5" r="1" fill="#16130e"/><path d="M2 20c2-1.4 4-1.4 6 0" fill="none" stroke="CUR" stroke-width="1.6" stroke-linecap="round" opacity=".6"/>',
+  stop: '<circle cx="12" cy="13.5" r="7.5" fill="none" stroke="CUR" stroke-width="2"/><path d="M9.5 2.5h5M12 2.5v2.4M18 7l1.4-1.4M12 13.5V9.5" fill="none" stroke="CUR" stroke-width="2" stroke-linecap="round"/>',
+  dice: '<rect x="4" y="4" width="16" height="16" rx="4" fill="CUR"/><g fill="#16130e"><circle cx="9" cy="9" r="1.5"/><circle cx="15" cy="9" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="9" cy="15" r="1.5"/><circle cx="15" cy="15" r="1.5"/></g>',
+};
+async function achievements() {
+  const W = 900, H = 206;
+  const items = [
+    { name: 'Pull Shark', desc: 'PRs mergeados', ring: C.teal, accent: C.tealText, icon: 'shark' },
+    { name: 'Quickdraw', desc: 'Issue cerrado en < 5 min', ring: C.terra, accent: C.coralText, icon: 'stop' },
+    { name: 'YOLO', desc: 'Merge sin review', ring: '#b88a2e', accent: '#edc968', icon: 'dice' },
+  ];
+  const fonts = await loadFonts({
+    700: items.map((i) => i.name),
+    500: items.map((i) => i.desc),
+  });
+  const cols = items.map((it, i) => {
+    const cx = W / 6 + (i * W) / 3;
+    const cy = 86, r = 40;
+    const iconGlyph = ACH_ICONS[it.icon].replace(/CUR/g, it.accent);
+    return `<g class="in" style="animation-delay:${(0.15 + i * 0.18).toFixed(2)}s">
+    <circle cx="${cx}" cy="${cy}" r="${r + 7}" fill="none" stroke="${it.ring}" stroke-opacity=".25" stroke-width="2"/>
+    <circle class="ring" cx="${cx}" cy="${cy}" r="${r}" fill="${it.ring}" fill-opacity=".12" stroke="${it.accent}" stroke-opacity=".8" stroke-width="2" style="transform-origin:${cx}px ${cy}px;animation-delay:${(i * 0.5).toFixed(1)}s"/>
+    <g transform="translate(${cx - 18} ${cy - 18}) scale(1.5)">${iconGlyph}</g>
+    <text x="${cx}" y="${cy + r + 34}" text-anchor="middle" font-size="18" font-weight="700" letter-spacing="-.2" fill="${C.cream}">${esc(it.name)}</text>
+    <text x="${cx}" y="${cy + r + 56}" text-anchor="middle" font-size="12.5" font-weight="500" fill="${C.mute}">${esc(it.desc)}</text>
+  </g>`;
+  }).join('\n  ');
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Logros de GitHub: ${items.map((i) => i.name).join(', ')}">
+<title>Logros de GitHub</title>
+<style>${fontFaces(fonts)}
+text{font-family:${FAMILY}}
+.in{animation:in .9s cubic-bezier(.2,.7,.2,1) both}
+@keyframes in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.ring{animation:pulse 3.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.75}50%{opacity:1;stroke-width:2.6}}
+.shine{animation:shine 6s ease-in-out infinite}
+@keyframes shine{0%{transform:translateX(-200px)}60%,100%{transform:translateX(${W + 60}px)}}
+${REDUCED}</style>
+<defs>
+  <clipPath id="c"><rect width="${W}" height="${H}" rx="16"/></clipPath>
+  <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="11" cy="11" r="1.1" fill="${C.cream}" fill-opacity=".06"/></pattern>
+  <linearGradient id="sh" x1="0" x2="1"><stop offset="0" stop-color="${C.cream}" stop-opacity="0"/><stop offset=".5" stop-color="${C.cream}" stop-opacity=".5"/><stop offset="1" stop-color="${C.cream}" stop-opacity="0"/></linearGradient>
+</defs>
+<g clip-path="url(#c)">
+  <rect width="${W}" height="${H}" fill="${C.ink}"/>
+  <rect width="${W}" height="${H}" fill="url(#dots)"/>
+  <rect width="${W}" height="3" fill="${C.teal}" fill-opacity=".7"/>
+  <rect class="shine" width="160" height="3" fill="url(#sh)"/>
+  ${cols}
+</g>
+<rect x=".5" y=".5" width="${W - 1}" height="${H - 1}" rx="15.5" fill="none" stroke="${C.cream}" stroke-opacity=".1"/>
+</svg>`;
+  await writeFile(new URL('logros.svg', OUT), svg);
+}
+
 await mkdir(new URL('cards/', OUT), { recursive: true });
-await Promise.all([header(), footer(), buttons(), cards()]);
+await Promise.all([header(), footer(), buttons(), cards(), achievements()]);
 console.log('SVG generados en assets/');

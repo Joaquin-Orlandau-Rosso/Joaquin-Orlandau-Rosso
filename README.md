@@ -58,6 +58,12 @@
   Más en mi <a href="https://portfolio-joaquin-orlandau-rosso.vercel.app/">portfolio</a>: <b>Ruleta Gamer</b> (Python + Twitch EventSub), <b>Twitch Clips AI</b> (Gemini) y el <a href="https://portafolio-danel-nine.vercel.app/">portfolio de Danel</a>.
 </p>
 
+### 🏆 Logros · Achievements
+
+<p align="center">
+  <img src="assets/logros.svg" width="100%" alt="Logros de GitHub: Pull Shark, Quickdraw y YOLO" />
+</p>
+
 <br />
 
 <p align="center">
